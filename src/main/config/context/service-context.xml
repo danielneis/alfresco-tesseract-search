@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!-- 
+    This file is part of the Tesseract Alfresco Integration written by
+    Simon White.    
+
+    The Integration is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The Integration is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the Integration.  If not, see <http://www.gnu.org/licenses/>.
+	 -->
+<beans>
+	<bean id="transformer.Tesseract"
+		class="org.alfresco.repo.content.transform.ProxyContentTransformer"
+		parent="baseContentTransformer">
+		<property name="worker">
+			<ref bean="transformer.worker.Tesseract" />
+		</property>
+		<property name="explicitTransformations">
+			<list>
+				<bean
+					class="org.alfresco.repo.content.transform.ExplictTransformationDetails">
+					<property name="sourceMimetype">
+						<value>image/png</value>
+					</property>
+					<property name="targetMimetype">
+						<value>text/plain</value>
+					</property>
+				</bean>
+				<bean
+					class="org.alfresco.repo.content.transform.ExplictTransformationDetails">
+					<property name="sourceMimetype">
+						<value>image/jpeg</value>
+					</property>
+					<property name="targetMimetype">
+						<value>text/plain</value>
+					</property>
+				</bean>
+				<bean
+					class="org.alfresco.repo.content.transform.ExplictTransformationDetails">
+					<property name="sourceMimetype">
+						<value>image/gif</value>
+					</property>
+					<property name="targetMimetype">
+						<value>text/plain</value>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="transformer.worker.Tesseract" class="smwc.alfresco.ocr.TesseractTransformWorker">
+		<property name="mimetypeService">
+			<ref bean="mimetypeService" />
+		</property>
+		<property name="executer">
+			<bean name="transformer.Tesseract.Command" class="org.alfresco.util.exec.RuntimeExec">
+				<property name="commandsAndArguments">
+					<map>
+						<entry key=".*">
+							<list>
+								<value>/usr/bin/tesseract</value>
+								<value>${source}</value>
+								<value>${target}</value>
+							</list>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+		<property name="checkCommand">
+			<bean name="transformer.Tesseract.CheckCommand" class="org.alfresco.util.exec.RuntimeExec">
+				<property name="commandsAndArguments">
+					<map>
+						<entry key=".*">
+							<list>
+								<value>/usr/bin/tesseract</value>
+								<value>-v</value>
+							</list>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>
